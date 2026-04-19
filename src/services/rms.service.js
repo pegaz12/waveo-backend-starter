@@ -69,35 +69,23 @@ function extractList(payload) {
 }
 
 export async function getDevices() {
-  const response = await fetch(
-    `${process.env.RMS_BASE_URL}${process.env.RMS_DEVICES_PATH}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.RMS_API_TOKEN}`,
-      },
-    }
-  );
+  const data = await rmsFetch(RMS_DEVICES_PATH);
+  const list = extractList(data);
 
-  const data = await response.json();
-
-  // 👇 CLEAN mapping
-  return data.map(d => {
-    const s = d.source;
+  return list.map((d) => {
+    const s = d.source ?? d;
 
     return {
-      id: s.serial,
-      name: s.name,
-      status: s.status === 1 ? "online" : "offline",
+      id: s.serial ?? s.id ?? d.id,
+      name: s.name ?? 'Unnamed device',
+      status: s.status === 1 ? 'online' : 'offline',
       connection: s.connection_type || s.connection_type_2 || null,
       signal: s.signal || s.rsrp || null,
-      wan_ip: s.wan_ip ? s.wan_ip.split("/")[0] : null,
-      data_used_mb: s.received
-        ? Math.round(s.received / 1024 / 1024)
-        : 0,
+      wan_ip: s.wan_ip ? s.wan_ip.split('/')[0] : null,
+      data_used_mb: s.received ? Math.round(s.received / 1024 / 1024) : 0,
     };
   });
 }
-
 export async function getDeviceSummary(deviceId) {
   const [statusPayload, clientsPayload, usagePayload] = await Promise.allSettled([
     rmsFetch(pathFor(RMS_DEVICE_STATUS_PATH_TEMPLATE, deviceId)),
