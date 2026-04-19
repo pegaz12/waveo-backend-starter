@@ -76,13 +76,45 @@ export async function getDevices() {
     const s = d.source ?? d;
 
     return {
-      id: s.serial ?? s.id ?? d.id,
+      id: s.id ?? d.id,
+      serial: s.serial ?? null,
       name: s.name ?? 'Unnamed device',
+      online: s.status === 1,
       status: s.status === 1 ? 'online' : 'offline',
-      connection: s.connection_type || s.connection_type_2 || null,
-      signal: s.signal || s.rsrp || null,
-      wan_ip: s.wan_ip ? s.wan_ip.split('/')[0] : null,
-      data_used_mb: s.received ? Math.round(s.received / 1024 / 1024) : 0,
+      model: s.model ?? null,
+      firmware: s.firmware ?? null,
+      uptime_seconds: s.router_uptime ?? null,
+      temperature: s.temperature ?? null,
+      temperature_2: s.temperature_2 ?? null,
+      wan: {
+        connected: !!s.wan_ip,
+        state: s.wan_state ?? null,
+        ip: s.wan_ip ? s.wan_ip.split('/')[0] : null,
+      },
+      modem1: {
+        carrier: s.operator ?? null,
+        network: s.connection_type ?? null,
+        connection_state: s.connection_state ?? null,
+        signal: s.signal ?? null,
+        rsrp: s.rsrp ?? null,
+        rsrq: s.rsrq ?? null,
+        sinr: s.sinr ?? null,
+        ip: s.mobile_ip ? s.mobile_ip.split('/')[0] : null,
+        iccid: s.iccid ?? null,
+      },
+      modem2: {
+        carrier: s.operator_2 ?? null,
+        network: s.connection_type_2 ?? null,
+        connection_state: s.connection_state_2 ?? null,
+        signal: s.signal_2 ?? null,
+        rsrp: s.rsrp_2 ?? null,
+        rsrq: s.rsrq_2 ?? null,
+        sinr: s.sinr_2 ?? null,
+        ip: s.mobile_ip_2 ? s.mobile_ip_2.split('/')[0] : null,
+        iccid: s.iccid_2 ?? null,
+      },
+      usage_mb: s.received ? Math.round(s.received / 1024 / 1024) : 0,
+      last_update_at: s.last_update_at ?? null,
     };
   });
 }
