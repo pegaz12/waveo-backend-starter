@@ -60,3 +60,34 @@ router.get("/usage/today", async (req, res) => {
 });
 
 export default router;
+
+router.get("/token-test", async (_req, res) => {
+  try {
+    const response = await fetch(`${process.env.PEPLINK_BASE_URL}/api/oauth2/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json"
+      },
+      body: new URLSearchParams({
+        client_id: process.env.PEPLINK_CLIENT_ID,
+        client_secret: process.env.PEPLINK_CLIENT_SECRET,
+        grant_type: "client_credentials"
+      })
+    });
+
+    const text = await response.text();
+
+    res.json({
+      ok: response.ok,
+      status: response.status,
+      contentType: response.headers.get("content-type"),
+      response: text.slice(0, 500)
+    });
+  } catch (err) {
+    res.status(500).json({
+      ok: false,
+      error: err.message
+    });
+  }
+});
