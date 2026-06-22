@@ -6,6 +6,17 @@ const router = express.Router();
 const ORG_ID = process.env.PEPLINK_ORG_ID;
 const GROUP_ID = process.env.PEPLINK_GROUP_ID;
 
+router.get("/debug", (_req, res) => {
+  res.json({
+    ok: true,
+    baseUrl: process.env.PEPLINK_BASE_URL,
+    orgIdExists: !!process.env.PEPLINK_ORG_ID,
+    groupIdExists: !!process.env.PEPLINK_GROUP_ID,
+    clientIdExists: !!process.env.PEPLINK_CLIENT_ID,
+    clientSecretExists: !!process.env.PEPLINK_CLIENT_SECRET
+  });
+});
+
 router.get("/devices", async (req, res) => {
   try {
     const data = await peplinkGet(`/rest/o/${ORG_ID}/g/${GROUP_ID}/d`);
