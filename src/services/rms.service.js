@@ -121,6 +121,57 @@ export async function getDevices() {
     };
   });
 }
+export async function getHotspotUsers(deviceId) {
+  const data = await rmsFetch(
+    pathFor(RMS_HOTSPOT_USERS_PATH_TEMPLATE, deviceId)
+  );
+
+  return {
+    ok: true,
+    source: 'teltonika',
+    deviceId,
+
+    users: extractList(data).map((user) => ({
+      name:
+        user.name ??
+        user.hostname ??
+        user.username ??
+        user.mac ??
+        'Unknown',
+
+      ip:
+        user.ip ??
+        user.ip_address ??
+        null,
+
+      mac:
+        user.mac ??
+        user.mac_address ??
+        null,
+
+      username:
+        user.username ??
+        null,
+
+      download:
+        user.download ??
+        user.rx ??
+        null,
+
+      upload:
+        user.upload ??
+        user.tx ??
+        null,
+
+      connectedSince:
+        user.connected_since ??
+        user.start_time ??
+        null,
+
+      raw: user,
+    })),
+  };
+}
 export async function getDeviceSummary(deviceId) {
   const [statusPayload, clientsPayload, usagePayload] = await Promise.allSettled([
     rmsFetch(pathFor(RMS_DEVICE_STATUS_PATH_TEMPLATE, deviceId)),
