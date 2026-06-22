@@ -33,15 +33,21 @@ function mapModem(modem) {
 
 router.get("/devices", async (_req, res) => {
   try {
-    const result = await peplinkGet(`/rest/o/${ORG_ID}/g/${GROUP_ID}/d`);
+
+    const result = await peplinkGet(
+      `/rest/o/${ORG_ID}/g/${GROUP_ID}/d`
+    );
 
     const devices = result.data.map((device) => {
+
       const wan = device.interfaces?.find(
         (i) => i.type === "ethernet" && i.enable
       );
 
       const cellularInterfaces =
-        device.interfaces?.filter((i) => i.virtualType === "cellular") || [];
+        device.interfaces?.filter(
+          (i) => i.virtualType === "cellular"
+        ) || [];
 
       const modem1 = cellularInterfaces[0];
       const modem2 = cellularInterfaces[1];
@@ -49,6 +55,7 @@ router.get("/devices", async (_req, res) => {
       const lan = device.vlan_interfaces?.[0];
 
       return {
+
         id: device.id,
         name: device.name,
         model: device.model,
@@ -59,7 +66,12 @@ router.get("/devices", async (_req, res) => {
 
         firmware: device.fw_ver,
         uptime: device.uptime,
-        temperature: device.temperature || device.system_temperature || device.temp,
+
+        temperature:
+          device.temperature ||
+          device.system_temperature ||
+          device.temp,
+
         clients: device.client_count,
 
         wanStatus: wan?.status,
@@ -80,12 +92,13 @@ router.get("/devices", async (_req, res) => {
         modem1: mapModem(modem1),
         modem2: mapModem(modem2),
 
-        wifi: device.ssid_mac_list?.map((ssid) => ({
-          ssid: ssid.essid,
-          radio: ssid.radio,
-          enabled: ssid.enable,
-          security: ssid.security
-        })) || [],
+        wifi:
+          device.ssid_mac_list?.map((ssid) => ({
+            ssid: ssid.essid,
+            radio: ssid.radio,
+            enabled: ssid.enable,
+            security: ssid.security
+          })) || [],
 
         carrier: modem1?.carrier_name,
         cellularStatus: modem1?.status,
@@ -95,6 +108,7 @@ router.get("/devices", async (_req, res) => {
         ip: modem1?.ip,
 
         lastSeen: device.last_online
+
       };
     });
 
@@ -103,7 +117,9 @@ router.get("/devices", async (_req, res) => {
       source: "peplink",
       devices
     });
+
   } catch (err) {
+
     console.error(err);
 
     res.status(500).json({
@@ -111,7 +127,54 @@ router.get("/devices", async (_req, res) => {
       source: "peplink",
       error: err.response?.data || err.message
     });
+
   }
+});
+
+router.get("/device/:id/clients-test", async (req, res) => {
+
+  const id = req.params.id;
+
+  const paths = [
+    `/rest/o/${ORG_ID}/g/${GROUP_ID}/d/${id}/clients`,
+    `/rest/o/${ORG_ID}/g/${GROUP_ID}/d/${id}/client`,
+    `/rest/o/${ORG_ID}/g/${GROUP_ID}/d/${id}/c`,
+    `/rest/o/${ORG_ID}/d/${id}/clients`,
+    `/rest/o/${ORG_ID}/d/${id}/client`
+  ];
+
+  const results = [];
+
+  for (const path of paths) {
+
+    try {
+
+      const data = await peplinkGet(path);
+
+      results.push({
+        path,
+        ok: true,
+        data
+      });
+
+    } catch (e) {
+
+      results.push({
+        path,
+        ok: false,
+        status: e.response?.status,
+        error:
+          typeof e.response?.data === "string"
+            ? e.response.data.substring(0, 150)
+            : e.message
+      });
+
+    }
+
+  }
+
+  res.json(results);
+
 });
 
 export default router;
