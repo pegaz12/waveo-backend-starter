@@ -59,6 +59,7 @@ router.get("/devices", async (_req, res) => {
 
         firmware: device.fw_ver,
         uptime: device.uptime,
+        temperature: device.temperature || device.system_temperature || device.temp,
         clients: device.client_count,
 
         wanStatus: wan?.status,
