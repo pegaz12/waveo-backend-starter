@@ -6,6 +6,31 @@ const router = express.Router();
 const ORG_ID = process.env.PEPLINK_ORG_ID;
 const GROUP_ID = process.env.PEPLINK_GROUP_ID;
 
+function mapModem(modem) {
+  return {
+    name: modem?.name,
+    carrier: modem?.carrier_name,
+    status: modem?.status,
+    ip: modem?.ip,
+
+    imei: modem?.imei,
+    iccid: modem?.sims?.[0]?.iccid,
+    imsi: modem?.sims?.[0]?.imsi,
+    apn: modem?.sims?.[0]?.apn || modem?.apn,
+
+    rsrp: modem?.cellular_signals?.rsrp,
+    rsrq: modem?.cellular_signals?.rsrq,
+    sinr: modem?.cellular_signals?.sinr,
+    rssi: modem?.cellular_signals?.rssi,
+
+    band: modem?.gobi_band_class_name,
+    technology: modem?.data_technology || modem?.mobile_type,
+
+    cellId: modem?.cell_tower?.cellId,
+    tac: modem?.cell_tower?.tac
+  };
+}
+
 router.get("/devices", async (_req, res) => {
   try {
     const result = await peplinkGet(`/rest/o/${ORG_ID}/g/${GROUP_ID}/d`);
@@ -20,6 +45,8 @@ router.get("/devices", async (_req, res) => {
 
       const modem1 = cellularInterfaces[0];
       const modem2 = cellularInterfaces[1];
+
+      const lan = device.vlan_interfaces?.[0];
 
       return {
         id: device.id,
@@ -37,25 +64,27 @@ router.get("/devices", async (_req, res) => {
         wanStatus: wan?.status,
         wanIP: wan?.ip,
 
-        modem1: {
-          name: modem1?.name,
-          carrier: modem1?.carrier_name,
-          status: modem1?.status,
-          ip: modem1?.ip,
-          rsrp: modem1?.cellular_signals?.rsrp,
-          rsrq: modem1?.cellular_signals?.rsrq,
-          sinr: modem1?.cellular_signals?.sinr,
+        wan: {
+          status: wan?.status,
+          ip: wan?.ip,
+          gateway: wan?.gateway,
+          mtu: wan?.mtu
         },
 
-        modem2: {
-          name: modem2?.name,
-          carrier: modem2?.carrier_name,
-          status: modem2?.status,
-          ip: modem2?.ip,
-          rsrp: modem2?.cellular_signals?.rsrp,
-          rsrq: modem2?.cellular_signals?.rsrq,
-          sinr: modem2?.cellular_signals?.sinr,
+        lan: {
+          ip: lan?.vlan_ip,
+          subnet: lan?.netmask
         },
+
+        modem1: mapModem(modem1),
+        modem2: mapModem(modem2),
+
+        wifi: device.ssid_mac_list?.map((ssid) => ({
+          ssid: ssid.essid,
+          radio: ssid.radio,
+          enabled: ssid.enable,
+          security: ssid.security
+        })) || [],
 
         carrier: modem1?.carrier_name,
         cellularStatus: modem1?.status,
@@ -64,14 +93,14 @@ router.get("/devices", async (_req, res) => {
         sinr: modem1?.cellular_signals?.sinr,
         ip: modem1?.ip,
 
-        lastSeen: device.last_online,
+        lastSeen: device.last_online
       };
     });
 
     res.json({
       ok: true,
       source: "peplink",
-      devices,
+      devices
     });
   } catch (err) {
     console.error(err);
@@ -79,7 +108,7 @@ router.get("/devices", async (_req, res) => {
     res.status(500).json({
       ok: false,
       source: "peplink",
-      error: err.response?.data || err.message,
+      error: err.response?.data || err.message
     });
   }
 });
