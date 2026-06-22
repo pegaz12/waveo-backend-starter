@@ -35,7 +35,7 @@ async function getToken() {
 export async function peplinkGet(path, params = {}) {
   const token = await getToken();
 
-  const response = await axios.get(`${BASE_URL}/api${path}`, {
+  const response = await axios.get(`${BASE_URL}${path}`, {
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/json"
