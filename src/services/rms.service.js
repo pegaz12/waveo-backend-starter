@@ -8,6 +8,9 @@ const RMS_DEVICE_CLIENTS_PATH_TEMPLATE =
   process.env.RMS_DEVICE_CLIENTS_PATH_TEMPLATE || '/api/devices/:id/clients';
 const RMS_DEVICE_USAGE_PATH_TEMPLATE =
   process.env.RMS_DEVICE_USAGE_PATH_TEMPLATE || '/api/devices/:id/usage/today';
+const RMS_HOTSPOT_USERS_PATH_TEMPLATE =
+  process.env.RMS_HOTSPOT_USERS_PATH_TEMPLATE ||
+  '/api/hotspots/:id/active-users';
 
 function buildUrl(path) {
   if (!RMS_BASE_URL) {
