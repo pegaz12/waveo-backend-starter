@@ -19,7 +19,7 @@ router.get("/debug", (_req, res) => {
 
 router.get("/devices", async (req, res) => {
   try {
-    const data = await peplinkGet(`/rest/o/${ORG_ID}/g/${GROUP_ID}/d`);
+    const data = await peplinkGet(`/rest/o/${ORG_ID}/g/${GROUP_ID}/devices`);
 
     res.json({
       ok: true,
