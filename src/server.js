@@ -4,6 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 
 import devicesRouter from './routes/devices.js';
+import peplinkRouter from './routes/peplink.js';
 import { errorHandler, notFoundHandler } from './utils/errors.js';
 
 const app = express();
@@ -33,6 +34,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/devices', devicesRouter);
+app.use('/peplink', peplinkRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
