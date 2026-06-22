@@ -17,7 +17,7 @@ router.get("/debug", (_req, res) => {
   });
 });
 
-router.get("/devices", async (req, res) => {
+router.get("/devices", async (_req, res) => {
   try {
     const data = await peplinkGet(`/rest/o/${ORG_ID}/g/${GROUP_ID}/devices`);
 
@@ -30,12 +30,40 @@ router.get("/devices", async (req, res) => {
     res.status(500).json({
       ok: false,
       source: "peplink",
-      error: err.response?.data || err.message
+      error: String(err.response?.data || err.message).slice(0, 1000)
     });
   }
 });
 
-router.get("/usage/today", async (req, res) => {
+router.get("/path-test", async (_req, res) => {
+  const paths = [
+    `/rest/o/${ORG_ID}/g/${GROUP_ID}/devices`,
+    `/rest/o/${ORG_ID}/g/${GROUP_ID}/d`,
+    `/rest/o/${ORG_ID}/g/${GROUP_ID}`,
+    `/rest/o/${ORG_ID}/devices`,
+    `/rest/o/${ORG_ID}/d`
+  ];
+
+  const results = [];
+
+  for (const path of paths) {
+    try {
+      const data = await peplinkGet(path);
+      results.push({ path, ok: true, data });
+    } catch (err) {
+      results.push({
+        path,
+        ok: false,
+        status: err.response?.status,
+        error: String(err.response?.data || err.message).slice(0, 200)
+      });
+    }
+  }
+
+  res.json(results);
+});
+
+router.get("/usage/today", async (_req, res) => {
   try {
     const today = new Date().toISOString().slice(0, 10);
 
@@ -54,40 +82,9 @@ router.get("/usage/today", async (req, res) => {
     res.status(500).json({
       ok: false,
       source: "peplink",
-      error: err.response?.data || err.message
+      error: String(err.response?.data || err.message).slice(0, 1000)
     });
   }
 });
 
 export default router;
-
-router.get("/token-test", async (_req, res) => {
-  try {
-    const response = await fetch(`${process.env.PEPLINK_BASE_URL}/api/oauth2/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json"
-      },
-      body: new URLSearchParams({
-        client_id: process.env.PEPLINK_CLIENT_ID,
-        client_secret: process.env.PEPLINK_CLIENT_SECRET,
-        grant_type: "client_credentials"
-      })
-    });
-
-    const text = await response.text();
-
-    res.json({
-      ok: response.ok,
-      status: response.status,
-      contentType: response.headers.get("content-type"),
-      response: text.slice(0, 500)
-    });
-  } catch (err) {
-    res.status(500).json({
-      ok: false,
-      error: err.message
-    });
-  }
-});
