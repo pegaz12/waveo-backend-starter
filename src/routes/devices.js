@@ -16,10 +16,6 @@ router.get('/', async (_req, res, next) => {
   }
 });
 
-/*
- * IMPORTANT:
- * This route MUST be above "/:id"
- */
 router.get('/:id/hotspot-users', async (req, res, next) => {
   try {
     const users = await getHotspotUsers(req.params.id);
