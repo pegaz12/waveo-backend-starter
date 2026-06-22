@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getDevices,
   getDeviceSummary,
+  getHotspotUsers,
 } from '../services/rms.service.js';
 
 const router = Router();
@@ -10,6 +11,19 @@ router.get('/', async (_req, res, next) => {
   try {
     const devices = await getDevices();
     res.json(devices);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/*
+ * IMPORTANT:
+ * This route MUST be above "/:id"
+ */
+router.get('/:id/hotspot-users', async (req, res, next) => {
+  try {
+    const users = await getHotspotUsers(req.params.id);
+    res.json(users);
   } catch (error) {
     next(error);
   }
