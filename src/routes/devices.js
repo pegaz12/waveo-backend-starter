@@ -4,6 +4,7 @@ import {
   getDeviceSummary,
   getHotspotUsers,
   testHotspotUserPaths,
+  testClientPaths,
 } from '../services/rms.service.js';
 
 const router = Router();
@@ -21,8 +22,21 @@ router.get('/', async (_req, res, next) => {
 });
 
 /*
- * Temporary endpoint to discover hotspot API paths
- * Remove once hotspot API is confirmed working.
+ * Test possible RMS client endpoints
+ * Temporary endpoint
+ */
+router.get('/:id/clients-test', async (req, res, next) => {
+  try {
+    const result = await testClientPaths(req.params.id);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/*
+ * Test possible RMS hotspot endpoints
+ * Temporary endpoint
  */
 router.get('/:id/hotspot-users-test', async (req, res, next) => {
   try {
@@ -35,10 +49,6 @@ router.get('/:id/hotspot-users-test', async (req, res, next) => {
 
 /*
  * Active Hotspot Users
- *
- * Example:
- * /devices/2214918/hotspot-users
- * /devices/2214918/hotspot-users?index=2
  */
 router.get('/:id/hotspot-users', async (req, res, next) => {
   try {
