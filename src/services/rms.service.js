@@ -121,53 +121,31 @@ export async function getDevices() {
     };
   });
 }
-export async function getHotspotUsers(deviceId) {
-  const data = await rmsFetch(
-    pathFor(RMS_HOTSPOT_USERS_PATH_TEMPLATE, deviceId)
-  );
+export async function getHotspotUsers(deviceId, hotspotIndex = 1) {
+  const path = RMS_HOTSPOT_USERS_PATH_TEMPLATE
+    .replace(':id', encodeURIComponent(deviceId))
+    .replace(':index', encodeURIComponent(hotspotIndex));
+
+  const data = await rmsFetch(path);
+
+  const users = data.hotspots_active_users ?? [];
 
   return {
     ok: true,
     source: 'teltonika',
     deviceId,
-
-    users: extractList(data).map((user) => ({
-      name:
-        user.name ??
-        user.hostname ??
-        user.username ??
-        user.mac ??
-        'Unknown',
-
-      ip:
-        user.ip ??
-        user.ip_address ??
-        null,
-
-      mac:
-        user.mac ??
-        user.mac_address ??
-        null,
-
-      username:
-        user.username ??
-        null,
-
-      download:
-        user.download ??
-        user.rx ??
-        null,
-
-      upload:
-        user.upload ??
-        user.tx ??
-        null,
-
-      connectedSince:
-        user.connected_since ??
-        user.start_time ??
-        null,
-
+    hotspotIndex,
+    users: users.map((user) => ({
+      name: user.username ?? user.name ?? user.hostname ?? user.mac ?? 'Unknown',
+      ip: user.ip ?? null,
+      mac: user.mac ?? null,
+      username: user.username ?? null,
+      ssid: user.ssid ?? null,
+      download: user.download ?? null,
+      upload: user.upload ?? null,
+      useTime: user.use_time ?? null,
+      startTime: user.start_time ?? null,
+      updatedAt: user.updated_at ?? null,
       raw: user,
     })),
   };
