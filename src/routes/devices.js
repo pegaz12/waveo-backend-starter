@@ -9,7 +9,7 @@ import {
 const router = Router();
 
 /*
- * List all devices
+ * List all RMS devices
  */
 router.get('/', async (_req, res, next) => {
   try {
@@ -21,8 +21,8 @@ router.get('/', async (_req, res, next) => {
 });
 
 /*
- * Discover correct RMS Hotspot API endpoint
- * (temporary - remove later)
+ * Temporary endpoint to discover hotspot API paths
+ * Remove once hotspot API is confirmed working.
  */
 router.get('/:id/hotspot-users-test', async (req, res, next) => {
   try {
@@ -34,19 +34,31 @@ router.get('/:id/hotspot-users-test', async (req, res, next) => {
 });
 
 /*
- * Return active hotspot users
+ * Active Hotspot Users
+ *
+ * Example:
+ * /devices/2214918/hotspot-users
+ * /devices/2214918/hotspot-users?index=2
  */
 router.get('/:id/hotspot-users', async (req, res, next) => {
   try {
-    const users = await getHotspotUsers(req.params.id);
+
+    const hotspotIndex = Number(req.query.index || 1);
+
+    const users = await getHotspotUsers(
+      req.params.id,
+      hotspotIndex
+    );
+
     res.json(users);
+
   } catch (error) {
     next(error);
   }
 });
 
 /*
- * Device details
+ * Device Details
  */
 router.get('/:id', async (req, res, next) => {
   try {
