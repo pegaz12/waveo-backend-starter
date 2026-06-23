@@ -291,3 +291,33 @@ export async function testHotspotUserPaths(deviceId) {
 
   return results;
 }
+export async function testClientPaths(deviceId) {
+  const paths = [
+    `/api/devices/${deviceId}/clients`,
+    `/api/devices/${deviceId}/client`,
+    `/api/devices/${deviceId}/lan/clients`,
+    `/api/devices/${deviceId}/wifi/clients`,
+    `/api/devices/${deviceId}/wireless/clients`,
+    `/api/devices/${deviceId}/connected-devices`,
+    `/api/devices/${deviceId}/connections`,
+    `/api/routers/${deviceId}/clients`,
+    `/api/routers/${deviceId}/devices`,
+  ];
+
+  const results = [];
+
+  for (const path of paths) {
+    try {
+      const data = await rmsFetch(path);
+      results.push({ path, ok: true, data });
+    } catch (err) {
+      results.push({
+        path,
+        ok: false,
+        error: err.message,
+      });
+    }
+  }
+
+  return results;
+}
