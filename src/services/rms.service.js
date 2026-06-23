@@ -286,3 +286,30 @@ export async function getDeviceSummary(deviceId) {
     },
   };
 }
+export async function testHotspotUserPaths(deviceId) {
+  const paths = [
+    `/api/hotspots/${deviceId}/active-users`,
+    `/api/hotspots/${deviceId}/users/active`,
+    `/api/hotspots/${deviceId}/users`,
+    `/api/devices/${deviceId}/hotspots/active-users`,
+    `/api/devices/${deviceId}/hotspot/active-users`,
+    `/api/devices/${deviceId}/hotspot/users`,
+  ];
+
+  const results = [];
+
+  for (const path of paths) {
+    try {
+      const data = await rmsFetch(path);
+      results.push({ path, ok: true, data });
+    } catch (err) {
+      results.push({
+        path,
+        ok: false,
+        error: err.message,
+      });
+    }
+  }
+
+  return results;
+}
