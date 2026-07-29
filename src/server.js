@@ -35,6 +35,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/devices', devicesRouter);
+app.use('/support', supportRouter);
 app.use('/peplink', peplinkRouter);
 
 app.use(notFoundHandler);
