@@ -5,6 +5,7 @@ import morgan from 'morgan';
 
 import devicesRouter from './routes/devices.js';
 import peplinkRouter from './routes/peplink.js';
+import supportRouter from './routes/support.js';
 import { errorHandler, notFoundHandler } from './utils/errors.js';
 
 const app = express();
