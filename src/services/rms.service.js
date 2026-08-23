@@ -321,3 +321,41 @@ export async function testClientPaths(deviceId) {
 
   return results;
 }
+
+export async function getWirelessClients(deviceId) {
+  const data = await rmsFetch(
+    `/api/devices/${encodeURIComponent(deviceId)}/wireless`
+  );
+
+  const wireless = data?.data ?? [];
+
+  const clients = [];
+
+  for (const wlan of wireless) {
+    for (const client of wlan.clients_data ?? []) {
+      clients.push({
+        ssid: wlan.ssid ?? null,
+        wlan_id: wlan.wlan_id ?? null,
+
+        ip: client.ip ?? null,
+        mac: client.mac ?? null,
+        name: client.name ?? null,
+
+        band: client.band ?? null,
+        signal: client.signal ?? null,
+        standard: client.standard ?? null,
+
+        rx_rate: client.rx_rate ?? null,
+        tx_rate: client.tx_rate ?? null,
+
+        interface: client.interface ?? null,
+      });
+    }
+  }
+
+  return {
+    deviceId,
+    clients,
+    count: clients.length,
+  };
+}
