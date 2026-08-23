@@ -162,7 +162,29 @@ const [statusPayload, clientsPayload, usagePayload, wifiPayload] =
   const statusRaw = statusPayload.status === 'fulfilled' ? statusPayload.value : null;
   const clientsRaw = clientsPayload.status === 'fulfilled' ? clientsPayload.value : [];
   const usageRaw = usagePayload.status === 'fulfilled' ? usagePayload.value : null;
+  const wifiRaw =
+  wifiPayload.status === 'fulfilled' ? wifiPayload.value : null;
 
+const wifiClients = [];
+
+for (const wlan of wifiRaw?.data ?? []) {
+  for (const client of wlan.clients_data ?? []) {
+    wifiClients.push({
+      ssid: wlan.ssid ?? null,
+      wlan_id: wlan.wlan_id ?? null,
+      ip: client.ip ?? null,
+      mac: client.mac ?? null,
+      name: client.name ?? null,
+      band: client.band ?? null,
+      signal: client.signal ?? null,
+      standard: client.standard ?? null,
+      rx_rate: client.rx_rate ?? null,
+      tx_rate: client.tx_rate ?? null,
+      interface: client.interface ?? null,
+    });
+  }
+}
+  
   const s = statusRaw?.source ?? statusRaw ?? {};
 
   const sentBytes = s.sent ?? usageRaw?.sent ?? 0;
