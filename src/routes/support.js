@@ -23,7 +23,22 @@ router.get('/device/:kitNumber', async (req, res, next) => {
       });
     }
 
-    res.json(device);
+    let wifiClients = [];
+
+    try {
+      const wifiResult = await getWirelessClients(device.id);
+      wifiClients = wifiResult.clients ?? [];
+    } catch (wifiError) {
+      console.error(
+        `Failed to retrieve Wi-Fi clients for ${kitNumber}:`,
+        wifiError.message
+      );
+    }
+
+    res.json({
+      ...device,
+      wifi_clients: wifiClients,
+    });
   } catch (error) {
     next(error);
   }
