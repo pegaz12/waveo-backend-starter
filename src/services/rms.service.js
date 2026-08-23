@@ -274,6 +274,8 @@ for (const wlan of wifiRaw?.data ?? []) {
       cell_tower_accuracy: s.cell_tower_accuracy ?? null,
     },
 
+    wifi_clients: wifiClients,
+    
     clients: extractList(clientsRaw).map((client) => ({
       mac: client.mac ?? client.mac_address ?? null,
       ip: client.ip ?? client.ip_address ?? null,
