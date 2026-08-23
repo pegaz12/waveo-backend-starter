@@ -5,6 +5,7 @@ import {
   getHotspotUsers,
   testHotspotUserPaths,
   testClientPaths,
+  getWirelessClients,
 } from '../services/rms.service.js';
 
 import { getDhcpLeases } from '../services/teltonika.device.service.js';
