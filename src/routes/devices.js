@@ -61,6 +61,18 @@ router.get('/:id/dhcp-leases', async (_req, res, next) => {
   }
 });
 
+/*
+ * Wi-Fi clients from Teltonika RMS
+ */
+router.get('/:id/wifi-clients', async (req, res, next) => {
+  try {
+    const clients = await getWirelessClients(req.params.id);
+    res.json(clients);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/:id', async (req, res, next) => {
   try {
     const device = await getDeviceSummary(req.params.id);
