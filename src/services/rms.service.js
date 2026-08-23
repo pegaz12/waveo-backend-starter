@@ -151,12 +151,14 @@ export async function getHotspotUsers(deviceId, hotspotIndex = 1) {
   };
 }
 export async function getDeviceSummary(deviceId) {
-  const [statusPayload, clientsPayload, usagePayload] = await Promise.allSettled([
+const [statusPayload, clientsPayload, usagePayload, wifiPayload] =
+  await Promise.allSettled([
     rmsFetch(pathFor(RMS_DEVICE_STATUS_PATH_TEMPLATE, deviceId)),
     rmsFetch(pathFor(RMS_DEVICE_CLIENTS_PATH_TEMPLATE, deviceId)),
     rmsFetch(pathFor(RMS_DEVICE_USAGE_PATH_TEMPLATE, deviceId)),
+    rmsFetch(`/api/devices/${encodeURIComponent(deviceId)}/wireless`),
   ]);
-
+  
   const statusRaw = statusPayload.status === 'fulfilled' ? statusPayload.value : null;
   const clientsRaw = clientsPayload.status === 'fulfilled' ? clientsPayload.value : [];
   const usageRaw = usagePayload.status === 'fulfilled' ? usagePayload.value : null;
