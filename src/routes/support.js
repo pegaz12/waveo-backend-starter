@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { getDevices } from '../services/rms.service.js';
+
+import {
+  getDevices,
+  getWirelessClients,
+} from '../services/rms.service.js';
 
 const router = Router();
 
