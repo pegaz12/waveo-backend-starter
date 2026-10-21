@@ -348,21 +348,32 @@ export async function testClientPaths(deviceId) {
   return results;
 }
 
+
 export async function getWirelessClients(deviceId) {
-  const data = await rmsFetch('/api/dhcp/leases/ipv4/status');
-  console.log('RMS DHCP leases response:', JSON.stringify(data));
-  const leases = data?.data ?? [];
+  const data = await rmsFetch(
+    `/api/devices/${encodeURIComponent(deviceId)}/wireless`
+  );
 
-  const clients = leases.map((lease) => ({
-    ip: lease.ipaddr ?? null,
-    mac: lease.macaddr ?? null,
-    name: lease.hostname ?? null,
-    interface: lease.interface ?? null,
-  }));
+  const wireless = data?.data ?? [];
+  const clients = [];
 
-  return {
-    deviceId,
-    clients,
-    count: clients.length,
-  };
+  for (const wlan of wireless) {
+    for (const client of wlan.clients_data ?? []) {
+      clients.push({
+        ssid: wlan.ssid ?? null,
+        wlan_id: wlan.wlan_id ?? null,
+        ip: client.ip ?? null,
+        mac: client.mac ?? null,
+        name: client.name ?? null,
+        band: client.band ?? null,
+        signal: client.signal ?? null,
+        standard: client.standard ?? null,
+        rx_rate: client.rx_rate ?? null,
+        tx_rate: client.tx_rate ?? null,
+        interface: client.interface ?? null,
+      });
+    }
+  }
+
+  return { deviceId, clients, count: clients.length };
 }
