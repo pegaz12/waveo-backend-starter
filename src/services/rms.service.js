@@ -349,7 +349,7 @@ export async function testClientPaths(deviceId) {
 }
 
 export async function getWirelessClients(deviceId) {
-  const data = await rmsFetch('/dhcp/leases/ipv4/status');
+  const data = await rmsFetch('/api/dhcp/leases/ipv4/status');
   console.log('RMS DHCP leases response:', JSON.stringify(data));
   const leases = data?.data ?? [];
 
