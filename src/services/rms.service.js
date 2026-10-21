@@ -365,10 +365,3 @@ export async function getWirelessClients(deviceId) {
     count: clients.length,
   };
 }
-
-  return {
-    deviceId,
-    clients,
-    count: clients.length,
-  };
-}
