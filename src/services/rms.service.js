@@ -352,6 +352,7 @@ export async function getWirelessClients(deviceId) {
   const data = await rmsFetch(
     `/api/devices/${encodeURIComponent(deviceId)}/wireless`
   );
+  console.log('RMS wireless response:', JSON.stringify(data));
 
   const wireless = data?.data ?? [];
 
